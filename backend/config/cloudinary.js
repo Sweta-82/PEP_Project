@@ -12,3 +12,4 @@ export const cloudinaryConnect = () => {
 		console.error("Cloudinary connection error ❌", error);
 	}
 };
+// this is a cloudinry setup
