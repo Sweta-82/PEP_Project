@@ -148,6 +148,84 @@ Notes:
 
 ---
 
+## Docker
+
+The repository includes a full Compose setup for the React client, Express API, and a local MongoDB container.
+
+1. Create a root `.env` file from the template:
+  ```bash
+  cp .env.example .env
+  ```
+  Then fill in any required secrets.
+2. Start the stack:
+  ```bash
+  docker compose up --build
+  ```
+3. Open the app at http://localhost:3000.
+
+Service startup order is managed automatically with health checks:
+- MongoDB becomes healthy first
+- Backend starts after MongoDB is healthy
+- Frontend starts after backend is healthy
+
+Container ports:
+- Frontend: 3000
+- Backend API: 4000
+- MongoDB: 27017
+
+Notes:
+- The frontend build uses `REACT_APP_BASE_URL=http://localhost:4000/api/v1` by default.
+- The backend accepts either `MONGODB_URL` or `MONGODB_URI`.
+- Cloudinary keys can be provided as either `API_KEY`/`API_SECRET` or `CLOUD_API_KEY`/`CLOUD_API_SECRET`.
+
+---
+
+## CI/CD (GitHub Actions -> AWS ECS)
+
+This repository now includes two workflows:
+
+- `.github/workflows/ci.yml`
+  - Runs on pull requests and selected branch pushes
+  - Installs dependencies, lints and builds frontend, and validates Docker image builds
+- `.github/workflows/cd-aws-ecs.yml`
+  - Runs on push to `main`/`master` and manual trigger
+  - Uses AWS OIDC auth, builds/pushes backend and frontend images to ECR, then deploys both ECS services
+
+### 1) Configure GitHub Secret
+
+Create this repository secret:
+
+- `AWS_ROLE_TO_ASSUME`: IAM role ARN that GitHub Actions can assume via OIDC
+
+### 2) Configure GitHub Variables
+
+Create these repository variables:
+
+- `AWS_REGION` (example: `ap-south-1`)
+- `ECR_REPOSITORY_FRONTEND` (example: `edvora/frontend`)
+- `ECR_REPOSITORY_BACKEND` (example: `edvora/backend`)
+- `ECS_CLUSTER` (example: `edvora-cluster`)
+- `ECS_SERVICE_FRONTEND` (example: `edvora-frontend-svc`)
+- `ECS_SERVICE_BACKEND` (example: `edvora-backend-svc`)
+- `FRONTEND_CONTAINER_NAME` (must match container name in ECS task definition)
+- `BACKEND_CONTAINER_NAME` (must match container name in ECS task definition)
+- `REACT_APP_BASE_URL` (example: `https://api.your-domain.com/api/v1`)
+- `REACT_APP_RAZORPAY_KEY` (public Razorpay key)
+
+### 3) AWS prerequisites
+
+- ECR repositories already created for frontend and backend
+- ECS cluster and both services already created
+- Task definitions for each service already exist, with container names matching the variables above
+- IAM role trust policy allows GitHub OIDC for your repository
+
+### 4) Deploy
+
+- Push to `main` (or `master`) to deploy automatically
+- Or run `CD - Deploy to AWS ECS` manually from the Actions tab
+
+---
+
 ## Configuration (.env)
 Create a `.env` file in the project root with the following variables (example values shown):
 

@@ -48,41 +48,24 @@ export async function buyCourse(token, courses, userDetails, navigate, dispatch)
         }
         console.log("PRINTING orderResponse", orderResponse);
         console.log("Razorpay Key:", process.env.REACT_APP_RAZORPAY_KEY); // Debug key value
-        //options
-        // const options = {
-        //     key: process.env.REACT_APP_RAZORPAY_KEY,
-        //     currency: orderResponse.data.data.currency,
-        //     amount: `${orderResponse.data.data.amount}`,
-        //     order_id:orderResponse.data.data.id,
-        //     name:"Edvora",
-        //     description: "Thank You for Purchasing the Course",
-        //     image:rzpLogo,
-        //     prefill: {
-        //         name:`${userDetails.firstName}`,
-        //         email:userDetails.email
-        //     },
-        //     handler: function(response) {
-        //         //send successful wala mail
-        //         sendPaymentSuccessEmail(response, orderResponse.data.data.amount,token );
-        //         //verifyPayment
-        //         verifyPayment({...response, courses}, token, navigate, dispatch);
-        //     }
+        
+        
         const options = {
-    key: process.env.REACT_APP_RAZORPAY_KEY, // must match .env
-    currency: orderResponse.data.data.currency,
-    amount: `${orderResponse.data.data.amount}`,
-    order_id: orderResponse.data.data.id,
-    name: "Edvora",
-    description: "Thank You for Purchasing the Course",
-    image: rzpLogo,
-    prefill: {
-        name: `${userDetails.firstName}`,
-        email: userDetails.email,
-    },
-    handler: function (response) {
-        sendPaymentSuccessEmail(response, orderResponse.data.data.amount, token);
-        verifyPayment({ ...response, courses }, token, navigate, dispatch);
-    },
+                key: process.env.REACT_APP_RAZORPAY_KEY, // must match .env
+                currency: orderResponse.data.data.currency,
+                amount: `${orderResponse.data.data.amount}`,
+                order_id: orderResponse.data.data.id,
+                name: "Edvora",
+                description: "Thank You for Purchasing the Course",
+                image: rzpLogo,
+                prefill: {
+                    name: `${userDetails.firstName}`,
+                    email: userDetails.email,
+            },
+            handler: function (response) {
+            sendPaymentSuccessEmail(response, orderResponse.data.data.amount, token);
+            verifyPayment({ ...response, courses }, token, navigate, dispatch);
+        },
 };
 
         //miss hogya tha 

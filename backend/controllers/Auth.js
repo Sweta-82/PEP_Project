@@ -165,6 +165,8 @@ export const signup = async (req, res) => {
 }
 
 
+
+
 //Login controller for authenticating users
 export const login = async (req, res) => {
   try {
@@ -181,7 +183,7 @@ export const login = async (req, res) => {
     }
 
     //Find user with provided email
-    const user = await User.findOne({ email }).populate("additionalDetails")
+    const user = await User.findOne({ email }).populate("additionalDetails").select("+password")
 
     //If user not found with provided email
     if (!user) {
@@ -203,8 +205,11 @@ export const login = async (req, res) => {
       )
       //Save token to user document in database
       user.token = token
-      user.password = undefined
-      
+      // undefined check anotther method for not sending user password in response body;
+
+      user.password=undefined
+
+  
       //Set cookie for token and return success response
       
       const options = {

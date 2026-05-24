@@ -8,6 +8,7 @@ import cors from "cors";
 import courseRoutes from "./routes/Course.js";
 import express from "express";
 import fileUpload from "express-fileupload";
+import { pathToFileURL } from "url";
 import paymentRoutes from "./routes/Payment.js";
 import profileRoutes from "./routes/Profile.js";
 import serverless from "serverless-http";
@@ -17,6 +18,7 @@ import userRoutes from "./routes/User.js";
 // ---------------- Config ----------------
 const app = express();
 const PORT = process.env.PORT || 4000;
+const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
 
 // ---------------- Database ----------------
 connect();
@@ -24,7 +26,7 @@ connect();
 // ---------------- ✅ FIXED GLOBAL CORS ----------------
 // ⚠️ REMOVE ALL MANUAL res.header CORS CODE
 const allowedOrigins = [
-  "http://localhost:3000",
+  frontendOrigin,
   // "http://localhost:3000/",
   "https://edvora-beryl.vercel.app", // deployed frontend (Vercel)
 ];
@@ -73,7 +75,10 @@ app.get("/", (req, res) => {
 });
 
 // ---------------- Server Setup ----------------
-if (process.env.NODE_ENV !== "production") {
+const isDirectExecution =
+  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectExecution) {
   app.listen(PORT, () => console.log(`✅ Running locally on port ${PORT}`));
 }
 
