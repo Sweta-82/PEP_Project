@@ -52,7 +52,7 @@
     "eject": "react-scripts eject",
     "backend": "cd backend && npm run dev",
     "dev": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"npm start\" \"npm run backend\"",
-    "lint": "eslint src --ext .js,.jsx"
+    "lint": "eslint src"
   },
   "browserslist": {
     "production": [

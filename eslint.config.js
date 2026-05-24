@@ -3,6 +3,7 @@ import globals from "globals"
 import js from "@eslint/js"
 import react from "eslint-plugin-react"
 import reactHooks from "eslint-plugin-react-hooks"
+import babelParser from "@babel/eslint-parser"
 
 export default [
   js.configs.recommended,
@@ -11,6 +12,13 @@ export default [
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ["@babel/preset-react"],
+        },
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
