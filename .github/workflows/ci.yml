@@ -65,21 +65,47 @@ jobs:
         run: npm pkg get name version type
 
   containers:
-    name: Docker Build Check
+    name: Docker Build and Push
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build backend image
-        run: docker build -f backend/Dockerfile -t study-notion-backend:ci .
+        run: |
+          TAG_PREFIX="${{ secrets.DOCKER_USERNAME }}"
+          if [ -z "$TAG_PREFIX" ]; then TAG_PREFIX="local"; fi
+          
+          docker build -f backend/Dockerfile \
+            -t ${TAG_PREFIX}/study-notion-backend:latest \
+            -t ${TAG_PREFIX}/study-notion-backend:${{ github.sha }} \
+            .
 
       - name: Build frontend image
         run: |
+          TAG_PREFIX="${{ secrets.DOCKER_USERNAME }}"
+          if [ -z "$TAG_PREFIX" ]; then TAG_PREFIX="local"; fi
+          
           docker build \
             --build-arg REACT_APP_BASE_URL=http://localhost:4000/api/v1 \
             --build-arg REACT_APP_RAZORPAY_KEY=dummy_key_for_ci \
             -f Dockerfile \
-            -t study-notion-frontend:ci \
+            -t ${TAG_PREFIX}/study-notion-frontend:latest \
+            -t ${TAG_PREFIX}/study-notion-frontend:${{ github.sha }} \
             .
+
+      - name: Push images to Docker Hub
+        if: github.event_name != 'pull_request'
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/study-notion-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/study-notion-backend:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/study-notion-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/study-notion-frontend:${{ github.sha }}
