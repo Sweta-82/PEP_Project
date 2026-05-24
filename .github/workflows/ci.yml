@@ -85,8 +85,8 @@ jobs:
           if [ -z "$TAG_PREFIX" ]; then TAG_PREFIX="local"; fi
           
           docker build -f backend/Dockerfile \
-            -t ${TAG_PREFIX}/study-notion-backend:latest \
-            -t ${TAG_PREFIX}/study-notion-backend:${{ github.sha }} \
+            -t ${TAG_PREFIX}/edvora-backend:latest \
+            -t ${TAG_PREFIX}/edvora-backend:${{ github.sha }} \
             .
 
       - name: Build frontend image
@@ -98,14 +98,14 @@ jobs:
             --build-arg REACT_APP_BASE_URL=http://localhost:4000/api/v1 \
             --build-arg REACT_APP_RAZORPAY_KEY=dummy_key_for_ci \
             -f Dockerfile \
-            -t ${TAG_PREFIX}/study-notion-frontend:latest \
-            -t ${TAG_PREFIX}/study-notion-frontend:${{ github.sha }} \
+            -t ${TAG_PREFIX}/edvora-frontend:latest \
+            -t ${TAG_PREFIX}/edvora-frontend:${{ github.sha }} \
             .
 
       - name: Push images to Docker Hub
         if: github.event_name != 'pull_request'
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/study-notion-backend:latest
-          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/study-notion-backend:${{ github.sha }}
-          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/study-notion-frontend:latest
-          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/study-notion-frontend:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/edvora-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/edvora-backend:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/edvora-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}/edvora-frontend:${{ github.sha }}
